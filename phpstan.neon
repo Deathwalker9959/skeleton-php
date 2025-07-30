@@ -1,0 +1,13 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
+        -
+            identifier: missingType.generics
+        - "#Call to an undefined method Mockery\\Expectation::andReturn\\(\\)#"
+    excludePaths:
+        - tests/*/

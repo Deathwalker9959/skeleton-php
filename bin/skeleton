@@ -1,0 +1,85 @@
+#!/usr/bin/env php
+<?php
+/**
+ * CLI tool to creat        // Copy bootstrap files
+        copy(__DIR__ . '/../bootstrap/autoload.php', "{$target}/autoload.php");
+        copy(__DIR__ . '/../bootstrap/config.php', "{$target}/config.php");
+        copy(__DIR__ . '/../bootstrap/index.template.php', "{$target}/index.php");
+        copy(__DIR__ . '/../bootstrap/.env.example', "{$target}/.env.example");
+        
+        // Copy CLI tool
+        copy(__DIR__ . '/../bootstrap/skeleton.project', "{$target}/bin/skeleton");
+        chmod("{$target}/bin/skeleton", 0755);
+        
+        echo "Skeleton project created in {$target}\n";project
+ */
+if ($argc < 2) {
+    echo "Usage: skeleton <command> [arguments]\n";
+    echo "Commands:\n";
+    echo "  create:project <directory>   Create a new Skeleton project\n";
+    echo "  create:controller <name>    Generate a new controller\n";
+    echo "  create:model <name>         Generate a new model\n";
+    echo "  create:docker               Generate a Docker environment\n";
+    exit(1);
+}
+
+$command = $argv[1];
+
+switch ($command) {
+    case 'create:project':
+        if ($argc < 3) {
+            echo "Usage: skeleton create:project <directory>\n";
+            exit(1);
+        }
+        $target = $argv[2];
+        if (file_exists($target)) {
+            echo "Directory {$target} already exists.\n";
+            exit(1);
+        }
+        mkdir($target, 0777, true);
+        
+        // Create directory structure
+        mkdir("{$target}/public", 0777, true);
+        mkdir("{$target}/app/Models", 0777, true);
+        mkdir("{$target}/app/Controllers", 0777, true);
+        mkdir("{$target}/app/Middleware", 0777, true);
+        mkdir("{$target}/app/Services", 0777, true);
+        mkdir("{$target}/routes", 0777, true);
+        mkdir("{$target}/resources/views", 0777, true);
+        mkdir("{$target}/storage/logs", 0777, true);
+        mkdir("{$target}/storage/cache", 0777, true);
+        mkdir("{$target}/storage/sessions", 0777, true);
+        mkdir("{$target}/bin", 0777, true);
+
+        // Copy bootstrap files
+        copy(__DIR__ . '/../bootstrap/project/autoload.php', "{$target}/autoload.php");
+        copy(__DIR__ . '/../bootstrap/project/config.php', "{$target}/config.php");
+        copy(__DIR__ . '/../bootstrap/project/index.php', "{$target}/index.php");
+        copy(__DIR__ . '/../bootstrap/project/.env.example', "{$target}/.env.example");
+        
+        // Copy CLI tool
+        copy(__DIR__ . '/../bootstrap/project/bin/skeleton', "{$target}/bin/skeleton");
+        chmod("{$target}/bin/skeleton", 0755);
+        
+        echo "Skeleton project created in {$target}\n";
+        break;
+
+    case 'create:controller':
+        echo "Error: This command should be run from within a project directory.\n";
+        echo "Use 'skeleton create:project <directory>' first to create a new project.\n";
+        exit(1);
+
+    case 'create:model':
+        echo "Error: This command should be run from within a project directory.\n";
+        echo "Use 'skeleton create:project <directory>' first to create a new project.\n";
+        exit(1);
+
+    case 'create:docker':
+        echo "Error: This command should be run from within a project directory.\n";
+        echo "Use 'skeleton create:project <directory>' first to create a new project.\n";
+        exit(1);
+
+    default:
+        echo "Unknown command: {$command}\n";
+        exit(1);
+}

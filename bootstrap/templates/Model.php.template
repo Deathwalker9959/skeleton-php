@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Models;
+
+use Skeleton\Models\Model;
+
+/**
+ * {{ClassName}} Model
+ */
+class {{ClassName}} extends Model
+{
+    /**
+     * The table associated with the model
+     */
+    protected static string $table = '{{table_name}}';
+
+    /**
+     * The attributes that are mass assignable
+     */
+    protected array $fillable = [
+        // Add your fillable attributes here
+        // 'name',
+        // 'email',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization
+     */
+    protected array $hidden = [
+        // Add attributes to hide from serialization
+        // 'password',
+    ];
+}
