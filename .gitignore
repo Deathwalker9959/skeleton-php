@@ -56,10 +56,6 @@ phpunit-junit.xml
 /storage/app/public/*
 /public/storage
 
-# Configuration
-config.php
-database.php
-
 # Backup files
 *.bak
 *.backup

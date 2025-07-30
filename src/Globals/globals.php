@@ -95,27 +95,79 @@ function snakeToCamel($input): string
 }
 
 /**
- * Simple pluralization function
+ * Comprehensive pluralization function
  *
  * @param string $word The word to pluralize
  * @return string The pluralized word
  */
 function pluralize(string $word): string
 {
-    // Handle special cases
+    // Handle empty string
+    if (empty($word)) {
+        return 's';
+    }
+    
+    $lowerWord = strtolower($word);
+    
+    // Handle irregular plurals
     $irregulars = [
         'child' => 'children',
         'person' => 'people',
         'man' => 'men',
         'woman' => 'women',
+        'tooth' => 'teeth',
+        'foot' => 'feet',
+        'mouse' => 'mice',
+        'goose' => 'geese',
+        'ox' => 'oxen',
+        'sheep' => 'sheep',
+        'deer' => 'deer',
+        'fish' => 'fish',
     ];
 
-    if (isset($irregulars[$word])) {
-        return $irregulars[$word];
+    if (isset($irregulars[$lowerWord])) {
+        return $irregulars[$lowerWord];
+    }
+
+    $length = strlen($word);
+    $lastChar = substr($word, -1);
+    $lastTwoChars = $length > 1 ? substr($word, -2) : '';
+    $precedingChar = $length > 1 ? substr($word, -2, 1) : '';
+    $vowels = ['a', 'e', 'i', 'o', 'u'];
+
+    // Words ending in 'y' preceded by a consonant: change 'y' to 'ies'
+    if ($lastChar === 'y') {
+        if ($length === 1 || !in_array(strtolower($precedingChar), $vowels)) {
+            return substr($word, 0, -1) . 'ies';
+        }
+    }
+
+    // Words ending in 'f' or 'fe': change to 'ves'
+    if ($lastChar === 'f') {
+        return substr($word, 0, -1) . 'ves';
+    }
+    if ($lastTwoChars === 'fe') {
+        return substr($word, 0, -2) . 'ves';
+    }
+
+    // Words ending in 's', 'ss', 'sh', 'ch', 'x', 'z': add 'es'
+    // Exception: single letter words ending in 'x' or 'z' just add 's'
+    if (preg_match('/([sxz]|sh|ch)$/', $word)) {
+        if ($length === 1 && ($lastChar === 'x' || $lastChar === 'z')) {
+            return "{$word}s";
+        }
+        return "{$word}es";
+    }
+
+    // Words ending in 'o' preceded by a consonant: add 'es'
+    if ($lastChar === 'o' && $length > 1) {
+        if (!in_array(strtolower($precedingChar), $vowels)) {
+            return "{$word}es";
+        }
     }
 
     // Default pluralization rule: add 's'
-    return $word . 's';
+    return "{$word}s";
 }
 
 /**

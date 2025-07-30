@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    container_name: skeleton-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - skeleton-network
+    depends_on:
+      - database
+
+  webserver:
+    image: nginx:alpine
+    container_name: skeleton-webserver
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - skeleton-network
+    depends_on:
+      - app
+
+  database:
+    image: mysql:8.0
+    container_name: skeleton-database
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-skeleton_db}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-skeleton}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - skeleton-network
+    ports:
+      - "3306:3306"
+
+networks:
+  skeleton-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local

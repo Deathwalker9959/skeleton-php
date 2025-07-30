@@ -1,0 +1,100 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Project CLI tool for Skeleton framework
+ */
+if ($argc < 2) {
+    echo "Usage: skeleton <command> [arguments]\n";
+    echo "Commands:\n";
+    echo "  create:controller <name>    Generate a new controller\n";
+    echo "  create:model <name>         Generate a new model\n";
+    echo "  create:docker               Generate a Docker environment\n";
+    exit(1);
+}
+
+$command = $argv[1];
+
+switch ($command) {
+    case 'create:controller':
+        if ($argc < 3) {
+            echo "Usage: skeleton create:controller <ControllerName>\n";
+            exit(1);
+        }
+        $name = $argv[2];
+        $filePath = "app/Controllers/{$name}.php";
+        if (file_exists($filePath)) {
+            echo "Controller {$name} already exists.\n";
+            exit(1);
+        }
+        
+        // Find template in vendor directory
+        $vendorTemplate = "vendor/skeleton/framework/bootstrap/templates/Controller.php.template";
+        if (!file_exists($vendorTemplate)) {
+            echo "Error: Controller template not found. Make sure skeleton/framework is installed via Composer.\n";
+            exit(1);
+        }
+        
+        $template = file_get_contents($vendorTemplate);
+        $content = str_replace('{{ClassName}}', $name, $template);
+        file_put_contents($filePath, $content);
+        
+        echo "Controller {$name} created at {$filePath}\n";
+        break;
+
+    case 'create:model':
+        if ($argc < 3) {
+            echo "Usage: skeleton create:model <ModelName>\n";
+            exit(1);
+        }
+        $name = $argv[2];
+        $filePath = "app/Models/{$name}.php";
+        if (file_exists($filePath)) {
+            echo "Model {$name} already exists.\n";
+            exit(1);
+        }
+        
+        // Find template in vendor directory
+        $vendorTemplate = "vendor/skeleton/framework/bootstrap/templates/Model.php.template";
+        if (!file_exists($vendorTemplate)) {
+            echo "Error: Model template not found. Make sure skeleton/framework is installed via Composer.\n";
+            exit(1);
+        }
+        
+        $template = file_get_contents($vendorTemplate);
+        $tableName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name)) . 's';
+        $content = str_replace(['{{ClassName}}', '{{table_name}}'], [$name, $tableName], $template);
+        file_put_contents($filePath, $content);
+        
+        echo "Model {$name} created at {$filePath}\n";
+        break;
+
+    case 'create:docker':
+        $dockerDir = "docker";
+        if (!file_exists($dockerDir)) {
+            mkdir($dockerDir, 0777, true);
+        }
+
+        // Create necessary directories
+        mkdir("{$dockerDir}/app", 0777, true);
+        mkdir("{$dockerDir}/nginx/conf.d", 0777, true);
+
+        // Check if vendor templates exist
+        $vendorDockerDir = "vendor/skeleton/framework/bootstrap/project/docker";
+        if (!file_exists($vendorDockerDir)) {
+            echo "Error: Docker templates not found. Make sure skeleton/framework is installed via Composer.\n";
+            exit(1);
+        }
+
+        // Copy Docker templates from vendor
+        copy("{$vendorDockerDir}/app/Dockerfile", "{$dockerDir}/app/Dockerfile");
+        copy("vendor/skeleton/framework/bootstrap/project/docker-compose.yml", "docker-compose.yml");
+        copy("{$vendorDockerDir}/nginx/default.conf", "{$dockerDir}/nginx/conf.d/default.conf");
+
+        echo "Docker environment created in {$dockerDir}\n";
+        echo "Run 'docker-compose up -d' to start the containers\n";
+        break;
+
+    default:
+        echo "Unknown command: {$command}\n";
+        exit(1);
+}
