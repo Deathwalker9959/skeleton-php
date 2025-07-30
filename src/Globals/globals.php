@@ -1,13 +1,25 @@
 <?php
+
 /**
- * Part of the Skeleton framework.
+ * Partfunction utf8ize($d): mixed
+{
+    if (is_array($d)) {
+        foreach ($d as $k => $v) {
+            $d[$k] = utf8ize($v);
+        }
+    } elseif (is_string($d)) {
+        return mb_convert_encoding($d, 'UTF-8', 'UTF-8');
+    }
+
+    return $d;
+}eton framework.
  */
 
 use Skeleton\Database\Transaction;
 use Skeleton\FileStorage;
-use Skeleton\FileStorageSingleton;
+use Skeleton\Singletons\FileStorageSingleton;
 use Skeleton\Router\Response;
-use Skeleton\TransactionSingleton;
+use Skeleton\Singletons\TransactionSingleton;
 
 /**
  * Converts all string values in an array to UTF-8 encoding
@@ -15,15 +27,16 @@ use Skeleton\TransactionSingleton;
  * @param mixed $d The input array or string
  * @return mixed The input array with all string values converted to UTF-8 encoding
  */
-function utf8ize($d)
+function utf8ize(mixed $d)
 {
     if (is_array($d)) {
         foreach ($d as $k => $v) {
             $d[$k] = utf8ize($v);
         }
-    } else if (is_string($d)) {
-        return utf8_encode($d);
+    } elseif (is_string($d)) {
+        return mb_convert_encoding($d, 'UTF-8');
     }
+
     return $d;
 }
 
@@ -43,14 +56,14 @@ function dd(): void
  *
  * @param mixed ...$vars The variable(s) to print
  */
-function dt()
+function dt(): void
 {
     $result = '';
     foreach (func_get_args() as $x) {
         $result .= json_encode($x, JSON_PRETTY_PRINT);
     }
+
     response()->body($result)->send();
-    return;
 }
 
 /**
@@ -61,7 +74,13 @@ function dt()
  */
 function camelToSnake($input): string
 {
-    return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $input));
+    // Handle consecutive uppercase letters (like HTML, XML, API, etc.)
+    // First, separate consecutive uppercase letters from following lowercase letters
+    $result = preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1_$2', $input);
+    // Then handle the transition from lowercase to uppercase
+    $result = preg_replace('/([a-z\d])([A-Z])/', '$1_$2', (string) $result);
+    
+    return strtolower((string) $result);
 }
 
 /**
@@ -76,22 +95,29 @@ function snakeToCamel($input): string
 }
 
 /**
- * Pluralizes a word.
- * @param string $word The word to pluralize.
- * @return string The pluralized word.
+ * Simple pluralization function
+ *
+ * @param string $word The word to pluralize
+ * @return string The pluralized word
  */
-function pluralize($word)
+function pluralize(string $word): string
 {
-    // Check if the word ends in 'y'
-    if (substr($word, -1) === 'y') {
-        // If it does, replace the 'y' with 'ies'
-        $plural = substr_replace($word, 'ies', -1);
-    } else {
-        // Otherwise, just add an 's' to the end of the word
-        $plural = $word . 's';
+    // Handle special cases
+    $irregulars = [
+        'child' => 'children',
+        'person' => 'people',
+        'man' => 'men',
+        'woman' => 'women',
+    ];
+
+    if (isset($irregulars[$word])) {
+        return $irregulars[$word];
     }
-    return $plural;
+
+    // Default pluralization rule: add 's'
+    return $word . 's';
 }
+
 /**
  * Creates and returns a new Response object
  *
@@ -122,16 +148,16 @@ function filestorage(): FileStorage
  *
  * @param string $fallback The fallback URL to use if the previous route cannot be determined.
  */
-function back($fallback = '/')
+function back(string $fallback = '/'): void
 {
     // Check if the previous URL is stored in the session
     if (isset($_SESSION['prev_url'])) {
         // Redirect to the previous URL
         header('Location: ' . $_SESSION['prev_url']);
         exit;
-    } else {
-        // Redirect to the fallback URL
-        header('Location: ' . $fallback);
-        exit;
     }
+
+    // Redirect to the fallback URL
+    header('Location: ' . $fallback);
+    exit;
 }

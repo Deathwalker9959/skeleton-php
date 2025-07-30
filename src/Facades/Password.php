@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of the Skeleton framework.
  */
@@ -16,7 +17,7 @@ class Password
      * @param string $password The password to hash
      * @return string The hashed password
      */
-    public static function hash(string $password)
+    public static function hash(string $password): string
     {
         return password_hash($password, PASSWORD_DEFAULT);
     }
@@ -28,7 +29,7 @@ class Password
      * @param string $hash The hash to compare the password to
      * @return bool True if the password matches the hash, false otherwise
      */
-    public static function verify(string $password, string $hash)
+    public static function verify(string $password, string $hash): bool
     {
         return password_verify($password, $hash);
     }

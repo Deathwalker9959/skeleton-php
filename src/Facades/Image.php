@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Part of the Skeleton framework.
  */
@@ -16,7 +17,7 @@ class Image
      * @param string $data The image data to encode
      * @return string The base64-encoded image data
      */
-    public static function encode(string $data)
+    public static function encode(string $data): string
     {
         return base64_encode($data);
     }
@@ -25,9 +26,9 @@ class Image
      * Decodes base64-encoded image data
      *
      * @param string $data The base64-encoded image data
-     * @return string|bool The decoded image data or false if the data is invalid
+     * @return string|false The decoded image data or false if the data is invalid
      */
-    public static function decode(string $data)
+    public static function decode(string $data): string|false
     {
         return base64_decode($data, true);
     }
@@ -38,15 +39,12 @@ class Image
      * @param string $data The string to calculate the size of
      * @return int The size of the string in bytes
      */
-    public static function size(string $data)
+    public static function size(string $data): int
     {
-        $size = 0;
         if (function_exists('mb_strlen')) {
-            $size = mb_strlen($data, '8bit');
-        } else {
-            $size = strlen($data);
+            return mb_strlen($data, '8bit');
         }
 
-        return $size;
+        return strlen($data);
     }
 }
