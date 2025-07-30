@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+/**
+ * CLI tool to create new Skeleton project
+ */
+if ($argc < 2) {
+    echo "Usage: skeleton <directory>\n";
+    exit(1);
+}
+$target = $argv[1];
+if (file_exists($target)) {
+    echo "Directory {$target} already exists.\n";
+    exit(1);
+}
+mkdir($target, 0777, true);
+file_put_contents("{$target}/index.php", "<?php\nrequire __DIR__.'/vendor/autoload.php';\n// Start coding\n");
+mkdir("{$target}/public", 0777, true);
+echo "Skeleton project created in {$target}\n";

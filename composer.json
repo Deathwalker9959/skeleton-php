@@ -1,0 +1,17 @@
+{
+    "name": "skeleton/framework",
+    "description": "Lightweight PHP skeleton framework",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Skeleton\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/skeleton"
+    ]
+}
